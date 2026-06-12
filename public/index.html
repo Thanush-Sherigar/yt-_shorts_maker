@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ViralCuts - Professional YouTube Shorts Maker & AI Clipper</title>
+  <meta name="description" content="ViralCuts is a professional AI YouTube Shorts Maker. Extract key viral moments from long videos, crop to 9:16 vertical layout, scale to 1080p, overlay subtitles, and add subscribe alerts dynamically.">
+  <meta name="keywords" content="youtube shorts maker, video highlights, ai moments extractor, 9:16 video crop, vertical video editor, subscribe alerts, automated captions">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="ViralCuts">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <!-- Link Frontend Logic -->
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-container">
+        <i class="fa-solid fa-scissors logo-icon"></i>
+        <h1>Viral<span>Cuts</span></h1>
+      </div>
+      <p class="tagline">Extract and render high-impact 9:16 shorts from long YouTube videos.</p>
+    </header>
+
+    <main class="main-content">
+      <!-- Setup Panel -->
+      <section class="card setup-section">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-sliders icon-primary"></i> Video Setup</h2>
+          <span class="badge" id="api-status">Key Required</span>
+        </div>
+        
+        <div class="setup-grid">
+          <div class="input-group">
+            <label for="gemini-key">Gemini API Key</label>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-key field-icon"></i>
+              <input type="password" id="gemini-key" placeholder="Enter Gemini API Key..." autocomplete="off">
+              <button class="icon-btn" id="toggle-key-visibility" type="button" title="Toggle Visibility">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+            <span class="help-text">Saved locally. Key is required to identify exact viral moments. <a href="https://aistudio.google.com/app/apikey" target="_blank" id="get-key-link" style="color: var(--primary); text-decoration: underline; font-weight: 500;">Get a free API Key here.</a></span>
+          </div>
+
+          <div class="input-group">
+            <label for="youtube-url">YouTube Video URL</label>
+            <div class="input-with-icon">
+              <i class="fa-brands fa-youtube field-icon yt-red"></i>
+              <input type="text" id="youtube-url" placeholder="https://www.youtube.com/watch?v=..." required>
+            </div>
+            <span class="help-text">Works on standard YouTube videos.</span>
+          </div>
+        </div>
+        
+        <div class="action-row">
+          <div class="advanced-toggle" id="advanced-settings-toggle">
+            <span>More Options</span> <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          
+          <button class="btn btn-primary" id="btn-fetch">
+            <i class="fa-solid fa-bolt"></i> Extract Viral Moments
+          </button>
+        </div>
+
+        <div class="advanced-settings-panel hidden" id="advanced-settings">
+          <div class="settings-grid">
+            <div class="input-group">
+              <label for="target-duration">Target Segment Duration</label>
+              <select id="target-duration">
+                <option value="30">Max 30 Seconds</option>
+                <option value="60" selected>Max 60 Seconds (Recommended)</option>
+                <option value="90">Max 90 Seconds</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="ai-model">AI Model Selection</label>
+              <select id="ai-model">
+                <option value="gemini-1.5-flash" selected>Gemini 1.5 Flash (Fast & Stable)</option>
+                <option value="gemini-2.5-flash">Gemini 2.5 Flash (Beta)</option>
+                <option value="gemini-1.5-pro">Gemini 1.5 Pro (High Reasoning)</option>
+              </select>
+            </div>
+            
+            <div class="checkbox-group">
+              <input type="checkbox" id="overlay-subs" checked>
+              <label for="overlay-subs">
+                <strong>Overlay Captions</strong>
+                <span class="help-text block">Render high-impact stylized subtitles on the video.</span>
+              </label>
+            </div>
+
+            <div class="checkbox-group">
+              <input type="checkbox" id="add-alerts" checked>
+              <label for="add-alerts">
+                <strong>Add Engagement Alerts</strong>
+                <span class="help-text block">Display a "Like & Subscribe" call-to-action banner during the short.</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Status/Loading Overlay -->
+      <section class="card status-section hidden" id="status-card">
+        <div class="spinner-container">
+          <div class="spinner"></div>
+        </div>
+        <h3 id="status-title">Processing Video...</h3>
+        <p id="status-desc">Fetching metadata and extracting transcript captions. This may take up to a minute.</p>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="status-progress" style="width: 15%;"></div>
+        </div>
+      </section>
+
+      <!-- Dashboard Grid -->
+      <div class="dashboard-grid hidden" id="dashboard">
+        <!-- Left Side: Video Preview Info -->
+        <div class="left-panel">
+          <section class="card video-details-card">
+            <div class="thumbnail-wrapper">
+              <img id="video-thumbnail" src="" alt="Video Thumbnail">
+              <span class="video-duration" id="video-duration">00:00</span>
+            </div>
+            <h2 class="video-title" id="video-title">YouTube Video Title Here</h2>
+            <div class="video-meta">
+              <span class="channel-name"><i class="fa-solid fa-circle-user"></i> <span id="video-channel">Channel Name</span></span>
+            </div>
+            <p class="video-desc" id="video-desc">Short description snippet...</p>
+          </section>
+        </div>
+
+        <!-- Right Side: Extracted Moments -->
+        <div class="right-panel">
+          <h2 class="section-title">
+            <i class="fa-solid fa-fire icon-orange"></i> Extracted Highlights
+            <span class="badge badge-success" id="moments-count">0 Found</span>
+          </h2>
+          <div class="moments-list" id="moments-list">
+            <!-- Dynamic moment cards inject here -->
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal for Video Preview -->
+    <div class="modal-overlay hidden" id="video-modal">
+      <div class="modal-content">
+        <button class="modal-close-btn" id="btn-close-modal" title="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="modal-body">
+          <div class="shorts-player-container">
+            <div class="player-wrapper">
+              <video id="shorts-video" controls loop autoplay></video>
+            </div>
+            <div class="shorts-sidebar">
+              <a href="" id="btn-download-short" class="sidebar-item btn-download" download>
+                <i class="fa-solid fa-download"></i>
+                <span>Download</span>
+              </a>
+            </div>
+          </div>
+          <div class="shorts-info-panel">
+            <h2 id="short-display-title">Perfect Shot Title</h2>
+            <p class="short-justification" id="short-display-reason">AI justification explanation...</p>
+            
+            <div class="meta-section">
+              <h3>Optimized Title</h3>
+              <div class="copy-box">
+                <span id="short-title-text">Optimized title text...</span>
+                <button class="btn-copy" data-target="short-title-text" title="Copy Title"><i class="fa-solid fa-copy"></i></button>
+              </div>
+            </div>
+
+            <div class="meta-section">
+              <h3>Optimized Description</h3>
+              <div class="copy-box desc-box">
+                <p id="short-desc-text">Optimized description details with hashtags...</p>
+                <button class="btn-copy" data-target="short-desc-text" title="Copy Description"><i class="fa-solid fa-copy"></i></button>
+              </div>
+            </div>
+
+            <div class="meta-section">
+              <h3>Thumbnail Design Suggestion</h3>
+              <div class="concept-box">
+                <p id="short-thumbnail-text">Description of the thumb...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>&copy; 2026 ViralCuts. All rights reserved. Created for content creators & editors.</p>
+    </footer>
+  </div>
+</body>
+</html>

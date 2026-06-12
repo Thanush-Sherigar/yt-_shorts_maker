@@ -1,0 +1,8 @@
+node_modules/
+bin/
+temp/
+public/shorts/*.mp4
+!public/shorts/.gitkeep
+.env
+.env.*
+.DS_Store

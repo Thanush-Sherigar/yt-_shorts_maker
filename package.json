@@ -1,0 +1,15 @@
+{
+  "name": "yt-shorts-maker",
+  "version": "1.0.0",
+  "description": "Extract viral moments from YouTube videos and make 9:16 shorts under 1 minute.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "ffmpeg-static": "^5.2.0"
+  }
+}
