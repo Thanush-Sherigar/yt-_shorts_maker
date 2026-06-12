@@ -1,11 +1,12 @@
 # Use a lightweight Node.js image
 FROM node:20-slim
 
-# Install system dependencies: python3 (required by yt-dlp) and curl (to download yt-dlp)
+# Install system dependencies: python3 (required by yt-dlp), curl, and ca-certificates
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     curl \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Set up working directory
