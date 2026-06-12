@@ -6,3 +6,4 @@ public/shorts/*.mp4
 .env
 .env.*
 .DS_Store
+cookies.txt

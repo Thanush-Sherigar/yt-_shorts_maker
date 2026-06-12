@@ -33,6 +33,25 @@ app.use(express.static(PUBLIC_DIR));
   }
 });
 
+// Check if YouTube cookies environment variable is set
+const cookiesPath = path.join(PROJECT_DIR, 'cookies.txt');
+if (process.env.YT_DLP_COOKIES) {
+  try {
+    fs.writeFileSync(cookiesPath, process.env.YT_DLP_COOKIES, 'utf8');
+    console.log('Successfully wrote cookies.txt from environment variable.');
+  } catch (err) {
+    console.error('Failed to write cookies.txt from environment variable:', err);
+  }
+}
+
+// Helper to append cookies argument to yt-dlp if cookies file is present
+function getYtDlpArgs(baseArgs) {
+  if (fs.existsSync(cookiesPath)) {
+    return [...baseArgs, '--cookies', cookiesPath];
+  }
+  return baseArgs;
+}
+
 // Ensure local font exists for FFmpeg drawtext filter (avoids Fontconfig/escaped colon drive path issues)
 const sysFontPath = 'C:\\Windows\\Fonts\\arial.ttf';
 const localFontPath = path.join(PROJECT_DIR, 'arial.ttf');
@@ -255,12 +274,12 @@ app.get('/api/analyze', async (req, res) => {
     console.log(`Analyzing video URL: ${url}`);
     
     // 1. Fetch metadata using yt-dlp
-    await runProcess(YT_DLP_PATH, [
+    await runProcess(YT_DLP_PATH, getYtDlpArgs([
       '--skip-download',
       '--dump-json',
       '-o', path.join(TEMP_DIR, videoId),
       url
-    ]).then(result => {
+    ])).then(result => {
       fs.writeFileSync(infoJsonPath, result.stdout);
     });
     
@@ -274,7 +293,7 @@ app.get('/api/analyze', async (req, res) => {
     const subPrefix = path.join(TEMP_DIR, `${videoId}_subs`);
     
     try {
-      await runProcess(YT_DLP_PATH, [
+      await runProcess(YT_DLP_PATH, getYtDlpArgs([
         '--skip-download',
         '--write-auto-subs',
         '--write-subs',
@@ -282,7 +301,7 @@ app.get('/api/analyze', async (req, res) => {
         '--sub-format', 'vtt',
         '-o', subPrefix,
         url
-      ]);
+      ]));
     } catch (subErr) {
       console.log('Error downloading English subtitles. Video might not have English subtitles.', subErr);
     }
@@ -344,14 +363,14 @@ app.post('/api/generate-short', async (req, res) => {
     
     // 1. Download specific section only using yt-dlp
     // We pass ffmpeg path to yt-dlp so it can cut it
-    await runProcess(YT_DLP_PATH, [
+    await runProcess(YT_DLP_PATH, getYtDlpArgs([
       '--ffmpeg-location', ffmpegPath,
       '--download-sections', `*${startSec}-${endSec}`,
       '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
       '--merge-output-format', 'mp4',
       '-o', rawClipPath,
       url
-    ]);
+    ]));
     
     if (!fs.existsSync(rawClipPath)) {
       throw new Error('Downloaded video clip not found. Download failed.');
