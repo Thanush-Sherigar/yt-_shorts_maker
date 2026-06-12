@@ -260,6 +260,26 @@ function convertCuesToSrt(cues, clipStartSec) {
   return srtContent;
 }
 
+// API: Debug Cookies
+app.get('/api/debug-cookies', (req, res) => {
+  const envVal = process.env.YT_DLP_COOKIES;
+  const exists = fs.existsSync(cookiesPath);
+  let fileContent = '';
+  let lineCount = 0;
+  if (exists) {
+    fileContent = fs.readFileSync(cookiesPath, 'utf8');
+    lineCount = fileContent.split(/\r?\n/).length;
+  }
+  
+  res.json({
+    envSet: !!envVal,
+    envLength: envVal ? envVal.length : 0,
+    fileExists: exists,
+    fileLineCount: lineCount,
+    fileSampleRedacted: fileContent ? fileContent.substring(0, 100).replace(/[A-Za-z0-9\-#_.\t]/g, '*') : ''
+  });
+});
+
 // API: Analyze Video & Extract Transcript
 app.get('/api/analyze', async (req, res) => {
   const { url } = req.query;
