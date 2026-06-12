@@ -314,13 +314,7 @@ app.get('/api/analyze', async (req, res) => {
     
   } catch (error) {
     console.error('Error during video analysis:', error);
-    let msg = 'Failed to analyze video.';
-    if (error.error && error.error.message) {
-      msg = `${error.error.message}\nStderr: ${error.stderr || ''}`;
-    } else if (error.message) {
-      msg = error.message;
-    }
-    res.status(500).json({ error: msg });
+    res.status(500).json({ error: error.message || 'Failed to analyze video.' });
   }
 });
 
@@ -375,9 +369,8 @@ app.post('/api/generate-short', async (req, res) => {
       // Use relative path for subtitles filter to avoid Windows drive letter colon syntax issues in ffmpeg
       const relativeSrtPath = path.relative(PROJECT_DIR, srtPath).replace(/\\/g, '/');
       
-      // Subtitle styling: White text, bold, fine outline, centered bottom alignment (2) with shadow and padding
-      // FontSize=16 is highly readable, MarginV=280 places it above the YouTube Shorts player UI elements
-      filterString += `,subtitles=${relativeSrtPath}:force_style='FontName=Arial,Alignment=2,FontSize=16,PrimaryColour=&HFFFFFF,OutlineColour=&H000000,BorderStyle=1,Outline=1.5,Shadow=1,Bold=1,MarginV=280'`;
+      // Subtitle styling: White text, bold, fine outline, centered bottom alignment (2) with shadow and padding (FontSize=24 for 1080p)
+      filterString += `,subtitles=${relativeSrtPath}:force_style='FontName=Arial,Alignment=2,FontSize=24,PrimaryColour=&HFFFFFF,OutlineColour=&H000000,BorderStyle=1,Outline=1.5,Shadow=1,Bold=1,MarginV=50'`;
     }
 
     if (addAlerts) {
@@ -418,13 +411,7 @@ app.post('/api/generate-short', async (req, res) => {
     // Cleanup on error
     try { if (fs.existsSync(rawClipPath)) fs.unlinkSync(rawClipPath); } catch (e) {}
     try { if (fs.existsSync(srtPath)) fs.unlinkSync(srtPath); } catch (e) {}
-    let msg = 'Failed to crop and process video.';
-    if (error.error && error.error.message) {
-      msg = `${error.error.message}\nStderr: ${error.stderr || ''}`;
-    } else if (error.message) {
-      msg = error.message;
-    }
-    res.status(500).json({ error: msg });
+    res.status(500).json({ error: error.message || 'Failed to crop and process video.' });
   }
 });
 
