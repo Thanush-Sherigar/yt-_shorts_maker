@@ -370,7 +370,7 @@ app.post('/api/generate-short', async (req, res) => {
       const relativeSrtPath = path.relative(PROJECT_DIR, srtPath).replace(/\\/g, '/');
       
       // Subtitle styling: White text, bold, fine outline, centered middle alignment (10) with no shadow and smooth edges (Outline=1)
-      filterString += `,subtitles=${relativeSrtPath}:force_style='FontName=Arial,Alignment=10,FontSize=20,PrimaryColour=&HFFFFFF,OutlineColour=&H000000,BorderStyle=1,Outline=1,Shadow=0,Bold=1,MarginV=0'`;
+      filterString += `,subtitles=${relativeSrtPath}:force_style='FontName=Arial,Alignment=10,FontSize=15,PrimaryColour=&HFFFFFF,OutlineColour=&H000000,BorderStyle=1,Outline=1,Shadow=0,Bold=1,MarginV=0'`;
     }
 
     if (addAlerts) {
