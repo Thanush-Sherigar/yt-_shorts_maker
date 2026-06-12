@@ -369,8 +369,8 @@ app.post('/api/generate-short', async (req, res) => {
       // Use relative path for subtitles filter to avoid Windows drive letter colon syntax issues in ffmpeg
       const relativeSrtPath = path.relative(PROJECT_DIR, srtPath).replace(/\\/g, '/');
       
-      // Subtitle styling: White text, bold, fine outline, centered middle alignment (5) with shadow and padding
-      filterString += `,subtitles=${relativeSrtPath}:force_style='FontName=Arial,Alignment=5,FontSize=16,PrimaryColour=&HFFFFFF,OutlineColour=&H000000,BorderStyle=1,Outline=1.5,Shadow=1,Bold=1,MarginV=0'`;
+      // Subtitle styling: White text, bold, fine outline, centered middle alignment (10) with no shadow and smooth edges (Outline=1)
+      filterString += `,subtitles=${relativeSrtPath}:force_style='FontName=Arial,Alignment=10,FontSize=20,PrimaryColour=&HFFFFFF,OutlineColour=&H000000,BorderStyle=1,Outline=1,Shadow=0,Bold=1,MarginV=0'`;
     }
 
     if (addAlerts) {
